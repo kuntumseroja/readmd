@@ -3,7 +3,10 @@ import Testing
 @testable import ReadMeCore
 
 struct FileTreeTests {
-    @Test func rootChildrenHideJunkAndDotfiles() {
+    @Test func rootChildrenHideJunkAndDotfiles() throws {
+        try FixtureProject.ensureDummyGit()
+        let gitDir = FixtureProject.root.appendingPathComponent(".git", isDirectory: true)
+        #expect(FileManager.default.fileExists(atPath: gitDir.path))
         let tree = FileTree(root: FixtureProject.root, rules: HideRules(showHidden: false))
         let names = tree.children(of: FixtureProject.root).map(\.name)
         #expect(names.contains("README.md"))
@@ -16,7 +19,10 @@ struct FileTreeTests {
         #expect(!names.contains(".env"))
     }
 
-    @Test func showHiddenRevealsDotfilesButNotJunk() {
+    @Test func showHiddenRevealsDotfilesButNotJunk() throws {
+        try FixtureProject.ensureDummyGit()
+        let gitDir = FixtureProject.root.appendingPathComponent(".git", isDirectory: true)
+        #expect(FileManager.default.fileExists(atPath: gitDir.path))
         let tree = FileTree(root: FixtureProject.root, rules: HideRules(showHidden: true))
         let names = tree.children(of: FixtureProject.root).map(\.name)
         #expect(names.contains(".env"))
