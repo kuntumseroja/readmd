@@ -4,7 +4,11 @@ import SwiftUI
 struct ReadMeApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("read.me")
+            ContentView()
         }
+        .commands {
+            CommandGroup(replacing: .newItem) {}
+        }
+        .defaultSize(width: 960, height: 640)
     }
 }

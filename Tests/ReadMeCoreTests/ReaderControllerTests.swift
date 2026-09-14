@@ -43,4 +43,15 @@ struct ReaderControllerTests {
         #expect(reader.openError == .missing)
         #expect(reader.session.folderURL?.standardizedFileURL == FixtureProject.root.standardizedFileURL)
     }
+
+    @Test func emptyStateCopyLivesInContentView() throws {
+        var url = URL(fileURLWithPath: #filePath)
+        url.deleteLastPathComponent() // ReaderControllerTests.swift
+        url.deleteLastPathComponent() // ReadMeCoreTests
+        url.deleteLastPathComponent() // Tests
+        let contentView = url.appendingPathComponent("Sources/ReadMe/ContentView.swift")
+        let source = try String(contentsOf: contentView, encoding: .utf8)
+        #expect(source.contains("Open a folder"))
+        #expect(source.contains("⌘O or read.me ."))
+    }
 }
