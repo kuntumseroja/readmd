@@ -16,6 +16,13 @@ struct LinkRouterTests {
         #expect(decision == .select(expected))
     }
 
+    @Test func hrefWithoutDotSlashSelects() {
+        #expect(
+            router.decide(href: "docs/guide.md") ==
+            .select(FixtureProject.root.appendingPathComponent("docs/guide.md").standardizedFileURL)
+        )
+    }
+
     @Test func parentRelativeFromNestedFileSelects() {
         let nested = LinkRouter(
             folderURL: FixtureProject.root,

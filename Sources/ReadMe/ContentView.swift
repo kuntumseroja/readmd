@@ -1,3 +1,4 @@
+import AppKit
 import ReadMeCore
 import SwiftUI
 import UniformTypeIdentifiers
@@ -30,7 +31,19 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ViewerView(preview: reader.preview, onLink: { reader.handleLink($0) })
+                ViewerView(
+                    preview: reader.preview,
+                    folderURL: reader.session.folderURL,
+                    currentFileURL: reader.session.selectedURL,
+                    onLink: { href in
+                        let decision = reader.linkDecision(for: href)
+                        if case .openExternal(let url) = decision {
+                            NSWorkspace.shared.open(url)
+                        } else {
+                            reader.handleLink(href)
+                        }
+                    }
+                )
             }
         }
         .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 320)
