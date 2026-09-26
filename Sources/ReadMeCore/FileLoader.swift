@@ -15,6 +15,18 @@ public enum FilePreview: Equatable, Sendable {
     case unavailable(name: String, size: Int64, type: String, reason: UnavailableReason)
 }
 
+public enum UnavailableCopy {
+    public static func message(for reason: UnavailableReason) -> String {
+        switch reason {
+        case .binary: return "binary"
+        case .tooLarge: return "too large to preview"
+        case .notText: return "not text"
+        case .permissionDenied: return "permission denied"
+        case .unreadable: return "unreadable"
+        }
+    }
+}
+
 public struct FileLoader: Equatable, Sendable {
     public static let maxByteCount = 2 * 1024 * 1024
     public var maxByteCount: Int

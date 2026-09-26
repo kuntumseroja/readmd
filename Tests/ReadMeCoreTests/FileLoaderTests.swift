@@ -78,4 +78,12 @@ struct FileLoaderTests {
             return
         }
     }
+
+    @Test func unavailableCopyMatchesSpec() {
+        #expect(UnavailableCopy.message(for: .binary) == "binary")
+        #expect(UnavailableCopy.message(for: .tooLarge) == "too large to preview")
+        #expect(UnavailableCopy.message(for: .notText) == "not text")
+        #expect(UnavailableCopy.message(for: .permissionDenied) == "permission denied")
+        #expect(UnavailableCopy.message(for: .unreadable) == "unreadable")
+    }
 }

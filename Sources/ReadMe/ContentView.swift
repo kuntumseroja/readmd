@@ -30,8 +30,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text("Viewer")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ViewerView(preview: reader.preview, onLink: { reader.handleLink($0) })
             }
         }
         .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 320)
