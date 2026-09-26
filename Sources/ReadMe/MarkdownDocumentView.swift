@@ -18,6 +18,10 @@ struct MarkdownDocumentView: View {
                     folderURL: folderURL,
                     currentFileURL: currentFileURL
                 ))
+                .markdownInlineImageProvider(ProjectInlineImageProvider(
+                    folderURL: folderURL,
+                    currentFileURL: currentFileURL
+                ))
                 .environment(\.openURL, OpenURLAction { url in
                     onLink(url.absoluteString.hasPrefix("file:")
                            ? relativeHREF(from: url)
@@ -52,14 +56,23 @@ struct ProjectImageProvider: ImageProvider {
 
     @ViewBuilder
     func makeImage(url: URL?) -> some View {
-        ProjectImage(folderURL: folderURL, currentFileURL: currentFileURL, href: href(from: url))
+        ProjectImage(folderURL: folderURL, currentFileURL: currentFileURL, href: markdownImageHref(from: url))
     }
+}
 
-    private func href(from url: URL?) -> String {
-        guard let url else { return "" }
-        if url.scheme == nil { return url.relativeString }
-        if url.isFileURL { return url.path }
-        return url.absoluteString
+struct ProjectInlineImageProvider: InlineImageProvider {
+    let folderURL: URL
+    let currentFileURL: URL
+
+    func image(with url: URL, label _: String) async throws -> Image {
+        if let nsImage = projectNSImage(
+            folderURL: folderURL,
+            currentFileURL: currentFileURL,
+            href: markdownImageHref(from: url)
+        ) {
+            return Image(nsImage: nsImage)
+        }
+        return Image(systemName: "photo")
     }
 }
 
@@ -69,15 +82,26 @@ private struct ProjectImage: View {
     let href: String
 
     var body: some View {
-        switch LinkRouter(folderURL: folderURL, currentFileURL: currentFileURL).decide(href: href) {
-        case .select(let fileURL):
-            if let image = NSImage(contentsOf: fileURL) {
-                Image(nsImage: image).resizable().scaledToFit()
-            } else {
-                Image(systemName: "photo").foregroundStyle(.secondary)
-            }
-        default:
+        if let image = projectNSImage(folderURL: folderURL, currentFileURL: currentFileURL, href: href) {
+            Image(nsImage: image).resizable().scaledToFit()
+        } else {
             Image(systemName: "photo").foregroundStyle(.secondary)
         }
+    }
+}
+
+private func markdownImageHref(from url: URL?) -> String {
+    guard let url else { return "" }
+    if url.scheme == nil { return url.relativeString }
+    if url.isFileURL { return url.path }
+    return url.absoluteString
+}
+
+private func projectNSImage(folderURL: URL, currentFileURL: URL, href: String) -> NSImage? {
+    switch LinkRouter(folderURL: folderURL, currentFileURL: currentFileURL).decide(href: href) {
+    case .select(let fileURL):
+        return NSImage(contentsOf: fileURL)
+    default:
+        return nil
     }
 }

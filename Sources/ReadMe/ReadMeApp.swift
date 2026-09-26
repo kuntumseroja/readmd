@@ -18,7 +18,7 @@ struct ReadMeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        WindowGroup {
+        Window("read.me", id: "main") {
             ContentView()
                 .environmentObject(store)
         }

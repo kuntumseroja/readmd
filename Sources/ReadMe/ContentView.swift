@@ -73,11 +73,6 @@ struct ContentView: View {
         } message: {
             Text(openErrorMessage)
         }
-        .onOpenURL { url in
-            store.update { controller in
-                controller.open(url)
-            }
-        }
         .focusedSceneValue(\.isOpening, $isOpening)
     }
 
