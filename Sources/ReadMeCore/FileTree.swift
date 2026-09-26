@@ -57,3 +57,15 @@ public struct FileTree: Equatable, Sendable {
         return result
     }
 }
+
+public enum FileIcon {
+    public static func systemName(for node: FileNode) -> String {
+        if node.isDirectory { return "folder.fill" }
+        switch node.url.pathExtension.lowercased() {
+        case "md", "markdown", "mdown": return "doc.richtext"
+        case "png", "jpg", "jpeg", "gif", "webp", "svg": return "photo"
+        case "swift", "js", "ts", "py", "go", "rs": return "chevron.left.forwardslash.chevron.right"
+        default: return "doc"
+        }
+    }
+}

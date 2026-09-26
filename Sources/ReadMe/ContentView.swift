@@ -8,9 +8,15 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            if reader.session.folderURL != nil {
-                Text("Tree")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if let folder = reader.session.folderURL {
+                FileTreeView(
+                    root: folder,
+                    showHidden: reader.session.showHidden,
+                    selectedURL: Binding(
+                        get: { reader.session.selectedURL },
+                        set: { reader.select($0) }
+                    )
+                )
             } else {
                 EmptyView()
             }

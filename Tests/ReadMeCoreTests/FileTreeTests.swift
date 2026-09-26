@@ -71,4 +71,15 @@ struct FileTreeTests {
         let folders = names.filter { ["assets", "docs", "src"].contains($0) }
         #expect(folders == ["assets", "docs", "src"])
     }
+
+    @Test func iconForFolderAndMarkdown() {
+        let folder = FileNode(url: FixtureProject.root, name: "SampleProject", isDirectory: true)
+        let readme = FileNode(
+            url: FixtureProject.root.appendingPathComponent("README.md"),
+            name: "README.md",
+            isDirectory: false
+        )
+        #expect(FileIcon.systemName(for: folder) == "folder.fill")
+        #expect(FileIcon.systemName(for: readme) == "doc.richtext")
+    }
 }
