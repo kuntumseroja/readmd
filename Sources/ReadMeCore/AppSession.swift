@@ -58,3 +58,21 @@ public struct AppSession: Equatable, Sendable {
         selectedURL = nil
     }
 }
+
+public enum CLIArgs {
+    public static func resolvedPath(
+        from arguments: [String],
+        cwd: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    ) -> URL? {
+        guard arguments.count >= 2 else { return nil }
+        let raw = arguments[1]
+        if raw == "~" || raw.hasPrefix("~/") {
+            let expanded = (raw as NSString).expandingTildeInPath
+            return URL(fileURLWithPath: expanded).standardizedFileURL
+        }
+        if raw.hasPrefix("/") {
+            return URL(fileURLWithPath: raw).standardizedFileURL
+        }
+        return cwd.appendingPathComponent(raw).standardizedFileURL
+    }
+}
