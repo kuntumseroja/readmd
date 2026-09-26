@@ -1,21 +1,11 @@
 import AppKit
-import ReadMeCore
 import SwiftUI
-
-private struct ReaderBindingKey: FocusedValueKey {
-    typealias Value = Binding<ReaderController>
-}
 
 private struct OpeningBindingKey: FocusedValueKey {
     typealias Value = Binding<Bool>
 }
 
 extension FocusedValues {
-    var reader: Binding<ReaderController>? {
-        get { self[ReaderBindingKey.self] }
-        set { self[ReaderBindingKey.self] = newValue }
-    }
-
     var isOpening: Binding<Bool>? {
         get { self[OpeningBindingKey.self] }
         set { self[OpeningBindingKey.self] = newValue }
@@ -24,9 +14,13 @@ extension FocusedValues {
 
 @main
 struct ReadMeApp: App {
+    @StateObject private var store = ReaderStore.shared
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(store)
         }
         .commands {
             CommandGroup(replacing: .newItem) {}
@@ -38,34 +32,35 @@ struct ReadMeApp: App {
             }
         }
         .defaultSize(width: 960, height: 640)
+        .handlesExternalEvents(matching: Set(["*"]))
     }
 }
 
 private struct OpenCloseFolderCommands: View {
-    @FocusedBinding(\.reader) private var reader
+    @ObservedObject private var store = ReaderStore.shared
     @FocusedBinding(\.isOpening) private var isOpening
 
     var body: some View {
         Button("Open Folder…") { isOpening = true }
             .keyboardShortcut("o", modifiers: .command)
         Button("Close Folder") {
-            guard var reader else { return }
-            reader.closeFolder()
-            self.reader = reader
+            store.update { controller in
+                controller.closeFolder()
+            }
         }
     }
 }
 
 private struct ShowHiddenAndSidebarCommands: View {
-    @FocusedBinding(\.reader) private var reader
+    @ObservedObject private var store = ReaderStore.shared
 
     var body: some View {
         Toggle("Show Hidden", isOn: Binding(
-            get: { reader?.session.showHidden ?? false },
+            get: { store.reader.session.showHidden },
             set: { show in
-                guard var reader else { return }
-                reader.setShowHidden(show)
-                self.reader = reader
+                store.update { controller in
+                    controller.setShowHidden(show)
+                }
             }
         ))
         Button("Toggle Sidebar") {

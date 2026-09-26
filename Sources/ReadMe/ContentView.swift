@@ -4,25 +4,29 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ContentView: View {
-    @State private var reader = ReaderController()
+    @EnvironmentObject private var store: ReaderStore
     @State private var isOpening = false
 
     var body: some View {
         NavigationSplitView {
-            if let folder = reader.session.folderURL {
+            if let folder = store.reader.session.folderURL {
                 FileTreeView(
                     root: folder,
-                    showHidden: reader.session.showHidden,
+                    showHidden: store.reader.session.showHidden,
                     selectedURL: Binding(
-                        get: { reader.session.selectedURL },
-                        set: { reader.select($0) }
+                        get: { store.reader.session.selectedURL },
+                        set: { url in
+                            store.update { controller in
+                                controller.select(url)
+                            }
+                        }
                     )
                 )
             } else {
                 EmptyView()
             }
         } detail: {
-            if reader.session.folderURL == nil {
+            if store.reader.session.folderURL == nil {
                 VStack(spacing: 8) {
                     Text("Open a folder")
                         .font(.title2)
@@ -32,15 +36,17 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ViewerView(
-                    preview: reader.preview,
-                    folderURL: reader.session.folderURL,
-                    currentFileURL: reader.session.selectedURL,
+                    preview: store.reader.preview,
+                    folderURL: store.reader.session.folderURL,
+                    currentFileURL: store.reader.session.selectedURL,
                     onLink: { href in
-                        let decision = reader.linkDecision(for: href)
+                        let decision = store.reader.linkDecision(for: href)
                         if case .openExternal(let url) = decision {
                             NSWorkspace.shared.open(url)
                         } else {
-                            reader.handleLink(href)
+                            store.update { controller in
+                                controller.handleLink(href)
+                            }
                         }
                     }
                 )
@@ -49,7 +55,7 @@ struct ContentView: View {
         .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 320)
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                Text(reader.session.folderURL?.lastPathComponent ?? "read.me")
+                Text(store.reader.session.folderURL?.lastPathComponent ?? "read.me")
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("Open Folder…") { isOpening = true }
@@ -58,20 +64,25 @@ struct ContentView: View {
         }
         .fileImporter(isPresented: $isOpening, allowedContentTypes: [.folder], onCompletion: handleOpenResult)
         .alert("Can’t open", isPresented: Binding(
-            get: { reader.openError != nil },
-            set: { if !$0 { reader.openError = nil } }
+            get: { store.reader.openError != nil },
+            set: { if !$0 { store.update { $0.openError = nil } } }
         )) {
-            Button("OK", role: .cancel) { reader.openError = nil }
+            Button("OK", role: .cancel) {
+                store.update { $0.openError = nil }
+            }
         } message: {
             Text(openErrorMessage)
         }
-        .onOpenURL { reader.open($0) }
-        .focusedSceneValue(\.reader, $reader)
+        .onOpenURL { url in
+            store.update { controller in
+                controller.open(url)
+            }
+        }
         .focusedSceneValue(\.isOpening, $isOpening)
     }
 
     private var openErrorMessage: String {
-        switch reader.openError {
+        switch store.reader.openError {
         case .missing: return "That path does not exist."
         case .notFileOrDirectory: return "That path is not a file or folder."
         case .folderUnreadable: return "That folder is not readable."
@@ -81,7 +92,9 @@ struct ContentView: View {
 
     private func handleOpenResult(_ result: Result<URL, Error>) {
         if case .success(let url) = result {
-            reader.open(url)
+            store.update { controller in
+                controller.open(url)
+            }
         }
     }
 }
