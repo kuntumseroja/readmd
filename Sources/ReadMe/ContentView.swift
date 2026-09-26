@@ -1,4 +1,3 @@
-import AppKit
 import ReadMeCore
 import SwiftUI
 import UniformTypeIdentifiers
@@ -49,24 +48,8 @@ struct ContentView: View {
             Text(openErrorMessage)
         }
         .onOpenURL { reader.open($0) }
-        .commands {
-            CommandGroup(after: .newItem) {
-                Button("Open Folder…") { isOpening = true }
-                    .keyboardShortcut("o", modifiers: .command)
-                Button("Close Folder") { reader.closeFolder() }
-            }
-            CommandMenu("View") {
-                Toggle("Show Hidden", isOn: Binding(
-                    get: { reader.session.showHidden },
-                    set: { reader.setShowHidden($0) }
-                ))
-                Button("Toggle Sidebar") {
-                    NSApp.keyWindow?.firstResponder?
-                        .tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
-                }
-                .keyboardShortcut("0", modifiers: .command)
-            }
-        }
+        .focusedSceneValue(\.reader, $reader)
+        .focusedSceneValue(\.isOpening, $isOpening)
     }
 
     private var openErrorMessage: String {
