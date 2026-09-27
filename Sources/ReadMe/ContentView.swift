@@ -8,52 +8,30 @@ struct ContentView: View {
     @State private var isOpening = false
 
     var body: some View {
-        NavigationSplitView {
-            if let folder = store.reader.session.folderURL {
-                FileTreeView(
-                    root: folder,
-                    showHidden: store.reader.session.showHidden,
-                    selectedURL: Binding(
-                        get: { store.reader.session.selectedURL },
-                        set: { url in
-                            store.update { controller in
-                                controller.select(url)
-                            }
-                        }
-                    )
-                )
-            } else {
-                EmptyView()
-            }
-        } detail: {
-            if store.reader.session.folderURL == nil {
-                VStack(spacing: 8) {
-                    Text("Open a folder")
-                        .font(.title2)
-                    Text("⌘O or read.me .")
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ViewerView(
-                    preview: store.reader.preview,
-                    folderURL: store.reader.session.folderURL,
-                    currentFileURL: store.reader.session.selectedURL,
-                    onLink: { href in
-                        let decision = store.reader.linkDecision(for: href)
-                        if case .openExternal(let url) = decision {
-                            NSWorkspace.shared.open(url)
-                        } else {
-                            store.update { controller in
-                                controller.handleLink(href)
-                            }
-                        }
+        HSplitView {
+            if store.showSidebar {
+                Group {
+                    if let folder = store.reader.session.folderURL {
+                        FileTreeView(
+                            root: folder,
+                            showHidden: store.reader.session.showHidden,
+                            selectedURL: Binding(
+                                get: { store.reader.session.selectedURL },
+                                set: { url in
+                                    store.update { controller in
+                                        controller.select(url)
+                                    }
+                                }
+                            )
+                        )
+                    } else {
+                        Color.clear
                     }
-                )
+                }
+                .frame(minWidth: 160, idealWidth: 220, maxWidth: 320)
             }
+            readerPane
         }
-        .navigationSplitViewStyle(.prominentDetail)
-        .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 320)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Text(store.reader.session.folderURL?.lastPathComponent ?? "read.me")
@@ -75,6 +53,35 @@ struct ContentView: View {
             Text(openErrorMessage)
         }
         .focusedSceneValue(\.isOpening, $isOpening)
+    }
+
+    @ViewBuilder
+    private var readerPane: some View {
+        if store.reader.session.folderURL == nil {
+            VStack(spacing: 8) {
+                Text("Open a folder")
+                    .font(.title2)
+                Text("⌘O or read.me .")
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            ViewerView(
+                preview: store.reader.preview,
+                folderURL: store.reader.session.folderURL,
+                currentFileURL: store.reader.session.selectedURL,
+                onLink: { href in
+                    let decision = store.reader.linkDecision(for: href)
+                    if case .openExternal(let url) = decision {
+                        NSWorkspace.shared.open(url)
+                    } else {
+                        store.update { controller in
+                            controller.handleLink(href)
+                        }
+                    }
+                }
+            )
+        }
     }
 
     private var openErrorMessage: String {

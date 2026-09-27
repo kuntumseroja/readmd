@@ -64,8 +64,7 @@ private struct ShowHiddenAndSidebarCommands: View {
             }
         ))
         Button("Toggle Sidebar") {
-            NSApp.keyWindow?.firstResponder?
-                .tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+            store.showSidebar.toggle()
         }
         .keyboardShortcut("0", modifiers: .command)
     }

@@ -6,6 +6,7 @@ final class ReaderStore: ObservableObject {
     static let shared = ReaderStore()
 
     @Published var reader = ReaderController()
+    @Published var showSidebar = true
 
     private init() {}
 
