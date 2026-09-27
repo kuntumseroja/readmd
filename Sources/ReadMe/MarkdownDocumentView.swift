@@ -28,7 +28,7 @@ struct MarkdownDocumentView: View {
                            : (url.scheme == nil ? url.path : url.absoluteString))
                     return .handled
                 })
-                .frame(maxWidth: 800, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

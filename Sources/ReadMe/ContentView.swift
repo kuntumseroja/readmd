@@ -52,6 +52,7 @@ struct ContentView: View {
                 )
             }
         }
+        .navigationSplitViewStyle(.prominentDetail)
         .navigationSplitViewColumnWidth(min: 160, ideal: 220, max: 320)
         .toolbar {
             ToolbarItem(placement: .navigation) {
