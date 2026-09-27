@@ -6,6 +6,8 @@ Markdown renders as a document. Source shows as highlighted, read-only code. Ima
 
 **v1.0** · macOS 14+ · Apple Silicon and Intel · bundle id `me.read.app`
 
+**[Download for Mac](https://github.com/kuntumseroja/readmd/releases/latest)** — `.pkg`, `.dmg`, or `.zip`
+
 ---
 
 ## What this project is
@@ -39,15 +41,17 @@ v1 does not search, tab, watch the disk, or talk to git. If you want to change a
 
 ## How to install
 
-You do not need Xcode to run the app. Use one of the packages (after a build they are in `dist/`):
+Download a Mac build from the [v1.0 release](https://github.com/kuntumseroja/readmd/releases/tag/v1.0). You do not need Xcode.
 
-| File | What to do |
+| Download | What to do |
 | --- | --- |
-| `read.me-1.0.pkg` | Double-click Installer. Puts the app in **Applications** and adds the `read.me` command. |
-| `read.me-1.0.dmg` | Open the disk. Drag **read.me** onto **Applications**. |
-| `read.me-1.0.zip` | Unzip. Move `read.me.app` into Applications. |
+| **[read.me-1.0.pkg](https://github.com/kuntumseroja/readmd/releases/download/v1.0/read.me-1.0.pkg)** | Double-click Installer. Puts the app in **Applications** and adds the `read.me` command. |
+| **[read.me-1.0.dmg](https://github.com/kuntumseroja/readmd/releases/download/v1.0/read.me-1.0.dmg)** | Open the disk. Drag **read.me** onto **Applications**. |
+| **[read.me-1.0.zip](https://github.com/kuntumseroja/readmd/releases/download/v1.0/read.me-1.0.zip)** | Unzip. Move `read.me.app` into Applications. |
 
-Needs **macOS 14 or later**.
+All releases: https://github.com/kuntumseroja/readmd/releases
+
+Needs **macOS 14 or later** (Apple Silicon or Intel).
 
 ### First open
 
@@ -94,12 +98,23 @@ open dist/read.me.app
 ./scripts/package-installer.sh
 ```
 
-Writes:
+Writes local files in `dist/` (not committed):
 
 - `dist/read.me.app` — the app (universal `arm64` + `x86_64`)
 - `dist/read.me-1.0.pkg` — installer + `read.me` CLI in `/usr/local/bin`
 - `dist/read.me-1.0.dmg` — drag-to-Applications disk
 - `dist/read.me-1.0.zip` — zipped app
+
+Publish those files as downloadable assets on a GitHub Release:
+
+```bash
+gh release create v1.0 \
+  dist/read.me-1.0.pkg \
+  dist/read.me-1.0.dmg \
+  dist/read.me-1.0.zip \
+  --title "read.me 1.0" \
+  --notes "macOS 14+ universal build. Right-click → Open the first time."
+```
 
 ### Daily loop
 
