@@ -9,7 +9,9 @@
     <key>CFBundleExecutable</key>
     <string>ReadMe</string>
     <key>CFBundleIconFile</key>
-    <string></string>
+    <string>AppIcon</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.developer-tools</string>
     <key>CFBundleIdentifier</key>
     <string>me.read.app</string>
     <key>CFBundleInfoDictionaryVersion</key>

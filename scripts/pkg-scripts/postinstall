@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+mkdir -p /usr/local/bin
+ln -sf "/Applications/read.me.app/Contents/MacOS/read.me" /usr/local/bin/read.me
+exit 0
