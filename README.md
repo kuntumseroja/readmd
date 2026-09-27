@@ -25,6 +25,12 @@ One window. One folder at a time. Opening another folder replaces the current on
 
 It is not an editor, not VS Code, and not a browser. No Electron, no Node, no WKWebView.
 
+### How it looks
+
+This is the app with this `README.md` open: sidebar on the left, rendered markdown on the right.
+
+![read.me open on README.md](docs/screenshots/readme-open.png)
+
 ---
 
 ## The idea
@@ -137,6 +143,7 @@ Rebuild the Dock icon from `Resources/AppIcon-1024.png` by running `bundle-app.s
 | `Sources/ReadMeCLI/` | `read.me` command — finds `me.read.app` and opens a path |
 | `Tests/ReadMeCoreTests/` | Swift Testing |
 | `Fixtures/SampleProject/` | Fixture folder for tests |
+| `docs/screenshots/` | App screenshots for this README |
 | `Resources/` | App icon |
 | `Info.plist` | Bundle metadata |
 | `scripts/bundle-app.sh` | Release `.app`, icon, ad-hoc sign |
